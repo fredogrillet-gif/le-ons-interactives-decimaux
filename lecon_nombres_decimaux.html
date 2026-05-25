@@ -1,0 +1,457 @@
+
+<style>
+:root { --accent: #185FA5; --accent-light: #E6F1FB; --accent-mid: #378ADD; --success: #3B6D11; --success-light: #EAF3DE; --warn: #BA7517; --warn-light: #FAEEDA; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.lesson { max-width: 680px; padding: 0 0 2rem; }
+.chapter { margin-bottom: 2rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.chapter-header { background: var(--color-background-secondary); padding: 12px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.chapter-num { width: 28px; height: 28px; border-radius: 50%; background: #185FA5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+.chapter-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+.chapter-arrow { font-size: 14px; color: var(--color-text-secondary); transition: transform 0.2s; }
+.chapter.open .chapter-arrow { transform: rotate(180deg); }
+.chapter-body { padding: 20px; display: none; }
+.chapter.open .chapter-body { display: block; }
+.rule-box { background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 12px 16px; margin-bottom: 16px; }
+.rule-box p { font-size: 14px; color: #0C447C; line-height: 1.6; }
+.rule-box strong { color: #042C53; font-weight: 500; }
+.example-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.example-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+.example-card .label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.example-card .value { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+.example-card .sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+.fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.2; gap: 2px; }
+.fraction span { display: block; text-align: center; }
+.fraction .bar { width: 100%; height: 1.5px; background: currentColor; }
+.arrow-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 14px; flex-wrap: wrap; }
+.arrow-row .step { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 10px; font-size: 13px; }
+.arrow-row .ti { color: var(--color-text-secondary); font-size: 14px; }
+table.deco { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0; }
+table.deco th { background: var(--color-background-secondary); padding: 8px 10px; font-weight: 500; border: 0.5px solid var(--color-border-tertiary); text-align: center; font-size: 13px; color: var(--color-text-secondary); }
+table.deco td { padding: 8px 10px; border: 0.5px solid var(--color-border-tertiary); text-align: center; }
+table.deco td.hl { background: var(--accent-light); color: #185FA5; font-weight: 500; }
+table.deco td.part { background: #FAEEDA; color: #BA7517; font-weight: 500; }
+.number-display { font-size: 24px; font-weight: 500; letter-spacing: 0.02em; margin: 12px 0; }
+.number-display .int { color: #185FA5; }
+.number-display .sep { color: var(--color-text-secondary); }
+.number-display .dec { color: #BA7517; }
+.decobox { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; }
+.decobox .dc { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 6px; text-align: center; }
+.decobox .dc .dc-val { font-size: 18px; font-weight: 500; }
+.decobox .dc .dc-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+.svg-wrap { overflow-x: auto; margin: 12px 0; }
+.quiz { margin-top: 16px; }
+.quiz-q { font-size: 14px; font-weight: 500; margin-bottom: 10px; color: var(--color-text-primary); }
+.quiz-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.quiz-opts button { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); cursor: pointer; color: var(--color-text-primary); transition: background 0.15s; }
+.quiz-opts button:hover { background: var(--color-background-secondary); }
+.quiz-opts button.correct { background: var(--success-light); border-color: #3B6D11; color: #27500A; }
+.quiz-opts button.wrong { background: #FCEBEB; border-color: #A32D2D; color: #501313; }
+.quiz-feedback { margin-top: 10px; font-size: 13px; padding: 8px 12px; border-radius: var(--border-radius-md); display: none; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.ok { background: var(--success-light); color: #27500A; }
+.quiz-feedback.ko { background: #FCEBEB; color: #791F1F; }
+.compare-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 16px; flex-wrap: wrap; }
+.nb { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 4px 12px; font-weight: 500; font-size: 15px; }
+.sign-sel { display: flex; gap: 6px; }
+.sign-sel button { width: 36px; height: 36px; font-size: 18px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); cursor: pointer; }
+.sign-sel button.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.encadre { display: flex; align-items: center; gap: 8px; font-size: 15px; margin: 10px 0; }
+.encadre input { width: 70px; font-size: 15px; text-align: center; padding: 4px 6px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+.check-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); cursor: pointer; color: var(--color-text-primary); }
+.check-btn:hover { background: var(--color-background-secondary); }
+p.body { font-size: 14px; line-height: 1.7; color: var(--color-text-primary); margin-bottom: 10px; }
+.tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+.tag-blue { background: var(--accent-light); color: #0C447C; }
+.tag-amber { background: var(--warn-light); color: #633806; }
+h4 { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin: 14px 0 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+</style>
+
+<div class="lesson">
+  <h2 style="sr-only">Leçon complète sur les nombres décimaux</h2>
+
+  <div style="padding: 20px 0 8px;">
+    <p class="body">Clique sur chaque chapitre pour le dérouler. Des exercices interactifs sont inclus à la fin de chaque partie.</p>
+  </div>
+
+  <!-- CH1 -->
+  <div class="chapter open" id="ch1">
+    <div class="chapter-header" onclick="toggle('ch1')">
+      <div class="chapter-num">1</div>
+      <div class="chapter-title">De la fraction décimale au nombre décimal</div>
+      <i class="ti ti-chevron-down chapter-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="chapter-body">
+      <div class="rule-box">
+        <p>Une <strong>fraction décimale</strong> est une fraction dont le dénominateur est 10, 100, 1 000…<br>
+        On peut toujours l'écrire comme un nombre décimal en déplaçant la virgule.</p>
+      </div>
+      <div class="arrow-row">
+        <span class="step"><span class="fraction"><span>7</span><span class="bar"></span><span>10</span></span></span>
+        <i class="ti ti-arrow-right"></i>
+        <span class="step">÷ 10 → 1 chiffre après la virgule</span>
+        <i class="ti ti-arrow-right"></i>
+        <span class="step"><strong>0,7</strong></span>
+      </div>
+      <div class="arrow-row">
+        <span class="step"><span class="fraction"><span>43</span><span class="bar"></span><span>100</span></span></span>
+        <i class="ti ti-arrow-right"></i>
+        <span class="step">÷ 100 → 2 chiffres après la virgule</span>
+        <i class="ti ti-arrow-right"></i>
+        <span class="step"><strong>0,43</strong></span>
+      </div>
+      <div class="arrow-row">
+        <span class="step"><span class="fraction"><span>258</span><span class="bar"></span><span>1000</span></span></span>
+        <i class="ti ti-arrow-right"></i>
+        <span class="step">÷ 1 000 → 3 chiffres après la virgule</span>
+        <i class="ti ti-arrow-right"></i>
+        <span class="step"><strong>0,258</strong></span>
+      </div>
+      <h4>Cas avec partie entière</h4>
+      <div class="arrow-row">
+        <span class="step"><span class="fraction"><span>347</span><span class="bar"></span><span>100</span></span></span>
+        <i class="ti ti-arrow-right"></i>
+        <span class="step">347 ÷ 100</span>
+        <i class="ti ti-arrow-right"></i>
+        <span class="step"><strong>3,47</strong></span>
+      </div>
+      <div class="rule-box" style="margin-top:14px">
+        <p><strong>Règle :</strong> Le nombre de zéros du dénominateur donne le nombre de chiffres après la virgule.</p>
+      </div>
+      <div class="quiz">
+        <div class="quiz-q">Quelle est l'écriture décimale de <strong>509 / 1 000</strong> ?</div>
+        <div class="quiz-opts" id="q1-opts">
+          <button onclick="check(this,'q1','a')">5,09</button>
+          <button onclick="check(this,'q1','b')">0,509</button>
+          <button onclick="check(this,'q1','c')">50,9</button>
+          <button onclick="check(this,'q1','d')">0,0509</button>
+        </div>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CH2 -->
+  <div class="chapter" id="ch2">
+    <div class="chapter-header" onclick="toggle('ch2')">
+      <div class="chapter-num">2</div>
+      <div class="chapter-title">Lecture et écriture des nombres décimaux</div>
+      <i class="ti ti-chevron-down chapter-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="chapter-body">
+      <div class="rule-box">
+        <p>Un nombre décimal a une <strong>partie entière</strong> (avant la virgule) et une <strong>partie décimale</strong> (après la virgule).</p>
+      </div>
+      <div class="number-display">
+        <span class="int">47</span><span class="sep">,</span><span class="dec">358</span>
+      </div>
+      <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;">
+        <span class="tag tag-blue">Partie entière : 47</span>
+        <span class="tag tag-amber">Partie décimale : 358</span>
+      </div>
+      <table class="deco">
+        <tr>
+          <th>Dizaines</th><th>Unités</th><th style="background:#E6F1FB;color:#185FA5;">virgule</th>
+          <th>Dixièmes</th><th>Centièmes</th><th>Millièmes</th>
+        </tr>
+        <tr>
+          <td class="hl">4</td><td class="hl">7</td><td style="font-weight:500;font-size:16px;">,</td>
+          <td class="part">3</td><td class="part">5</td><td class="part">8</td>
+        </tr>
+      </table>
+      <h4>Comment lire ?</h4>
+      <p class="body">On lit la partie entière normalement, puis on dit « virgule », puis on lit la partie décimale comme un entier en précisant l'unité du dernier chiffre.</p>
+      <div class="example-grid">
+        <div class="example-card"><div class="label">Nombre</div><div class="value">6,4</div><div class="sub">« six virgule quatre » ou « six et quatre dixièmes »</div></div>
+        <div class="example-card"><div class="label">Nombre</div><div class="value">12,07</div><div class="sub">« douze virgule zéro sept » ou « douze et sept centièmes »</div></div>
+        <div class="example-card"><div class="label">Nombre</div><div class="value">0,305</div><div class="sub">« zéro virgule trois cent cinq millièmes »</div></div>
+        <div class="example-card"><div class="label">Nombre</div><div class="value">100,1</div><div class="sub">« cent virgule un » ou « cent et un dixième »</div></div>
+      </div>
+      <div class="quiz">
+        <div class="quiz-q">Le chiffre des <strong>centièmes</strong> dans 15,<span style="color:#BA7517">2</span><span style="color:#BA7517;text-decoration:underline">8</span>3 est :</div>
+        <div class="quiz-opts" id="q2-opts">
+          <button onclick="check(this,'q2','a')">2</button>
+          <button onclick="check(this,'q2','b')">8</button>
+          <button onclick="check(this,'q2','c')">3</button>
+          <button onclick="check(this,'q2','d')">1</button>
+        </div>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CH3 -->
+  <div class="chapter" id="ch3">
+    <div class="chapter-header" onclick="toggle('ch3')">
+      <div class="chapter-num">3</div>
+      <div class="chapter-title">Décomposition des nombres décimaux</div>
+      <i class="ti ti-chevron-down chapter-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="chapter-body">
+      <div class="rule-box">
+        <p>Décomposer un nombre décimal, c'est l'écrire comme une <strong>somme de valeurs de position</strong>.</p>
+      </div>
+      <p class="body">Exemple avec <strong>47,358</strong> :</p>
+      <div class="decobox">
+        <div class="dc" style="border-top:3px solid #185FA5;"><div class="dc-val" style="color:#185FA5;">40</div><div class="dc-label">4 dizaines</div></div>
+        <div class="dc" style="border-top:3px solid #185FA5;"><div class="dc-val" style="color:#185FA5;">7</div><div class="dc-label">7 unités</div></div>
+        <div class="dc" style="border-top:3px solid #BA7517;"><div class="dc-val" style="color:#BA7517;">0,3</div><div class="dc-label">3 dixièmes</div></div>
+        <div class="dc" style="border-top:3px solid #BA7517;"><div class="dc-val" style="color:#BA7517;">0,05</div><div class="dc-label">5 centièmes</div></div>
+      </div>
+      <div class="dc" style="border-top:3px solid #BA7517; border-radius:var(--border-radius-md); padding:10px 6px; text-align:center; background:var(--color-background-secondary); margin-bottom:12px; border:0.5px solid var(--color-border-tertiary);">
+        <div class="dc-val" style="color:#BA7517;">0,008</div><div class="dc-label">8 millièmes</div>
+      </div>
+      <div class="arrow-row" style="font-size:15px;">
+        <span style="font-weight:500;">47,358</span>
+        <i class="ti ti-equal" style="color:var(--color-text-secondary)"></i>
+        <span><span style="color:#185FA5">40 + 7</span> + <span style="color:#BA7517">0,3 + 0,05 + 0,008</span></span>
+      </div>
+      <h4>Autres formes de décomposition</h4>
+      <div class="example-grid">
+        <div class="example-card"><div class="label">En dixièmes</div><div class="value" style="font-size:15px;">47,358 = <span class="fraction"><span>4 735</span><span class="bar"></span><span>100</span></span> + 8 millièmes</div></div>
+        <div class="example-card"><div class="label">En centièmes</div><div class="value" style="font-size:15px;">47,358 = 4 735 centièmes + 8 millièmes</div></div>
+      </div>
+      <div class="quiz">
+        <div class="quiz-q">Laquelle de ces décompositions correspond à <strong>5,064</strong> ?</div>
+        <div class="quiz-opts" id="q3-opts">
+          <button onclick="check(this,'q3','a')">5 + 0,6 + 0,04</button>
+          <button onclick="check(this,'q3','b')">5 + 0,06 + 0,004</button>
+          <button onclick="check(this,'q3','c')">5 + 0,6 + 0,004</button>
+          <button onclick="check(this,'q3','d')">50 + 0,064</button>
+        </div>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CH4 -->
+  <div class="chapter" id="ch4">
+    <div class="chapter-header" onclick="toggle('ch4')">
+      <div class="chapter-num">4</div>
+      <div class="chapter-title">Placer des décimaux sur une droite graduée</div>
+      <i class="ti ti-chevron-down chapter-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="chapter-body">
+      <div class="rule-box">
+        <p>On repère d'abord entre quels <strong>entiers consécutifs</strong> se trouve le nombre, puis on divise l'intervalle en 10 parts égales pour les dixièmes, ou 100 pour les centièmes.</p>
+      </div>
+      <p class="body">Clique sur la bonne position pour placer le nombre sur la droite.</p>
+      <div id="droite-container" style="margin:16px 0;"></div>
+      <div id="droite-msg" style="font-size:13px;min-height:24px;color:var(--color-text-secondary);"></div>
+    </div>
+  </div>
+
+  <!-- CH5 -->
+  <div class="chapter" id="ch5">
+    <div class="chapter-header" onclick="toggle('ch5')">
+      <div class="chapter-num">5</div>
+      <div class="chapter-title">Encadrer un décimal entre deux entiers</div>
+      <i class="ti ti-chevron-down chapter-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="chapter-body">
+      <div class="rule-box">
+        <p>Encadrer un nombre décimal entre deux entiers consécutifs, c'est trouver <strong>l'entier immédiatement inférieur</strong> et <strong>l'entier immédiatement supérieur</strong>.</p>
+      </div>
+      <p class="body">Méthode : on garde seulement la partie entière pour le bas, et on ajoute 1 pour le haut.</p>
+      <div class="example-grid">
+        <div class="example-card"><div class="label">Exemple</div><div class="value" style="font-size:15px;"><span style="color:#185FA5">3</span> &lt; 3,72 &lt; <span style="color:#185FA5">4</span></div><div class="sub">partie entière = 3 ; 3+1 = 4</div></div>
+        <div class="example-card"><div class="label">Exemple</div><div class="value" style="font-size:15px;"><span style="color:#185FA5">12</span> &lt; 12,05 &lt; <span style="color:#185FA5">13</span></div><div class="sub">partie entière = 12 ; 12+1 = 13</div></div>
+        <div class="example-card"><div class="label">Exemple</div><div class="value" style="font-size:15px;"><span style="color:#185FA5">0</span> &lt; 0,9 &lt; <span style="color:#185FA5">1</span></div><div class="sub">partie entière = 0 ; 0+1 = 1</div></div>
+        <div class="example-card"><div class="label">Exemple</div><div class="value" style="font-size:15px;"><span style="color:#185FA5">99</span> &lt; 99,99 &lt; <span style="color:#185FA5">100</span></div><div class="sub">partie entière = 99 ; 99+1 = 100</div></div>
+      </div>
+      <h4>Exercice interactif</h4>
+      <p class="body">Complète l'encadrement :</p>
+      <div id="enc-zone"></div>
+    </div>
+  </div>
+
+  <!-- CH6 -->
+  <div class="chapter" id="ch6">
+    <div class="chapter-header" onclick="toggle('ch6')">
+      <div class="chapter-num">6</div>
+      <div class="chapter-title">Comparer et ordonner des nombres décimaux</div>
+      <i class="ti ti-chevron-down chapter-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="chapter-body">
+      <div class="rule-box">
+        <p>Pour comparer deux nombres décimaux, on compare <strong>rang par rang</strong> de gauche à droite : d'abord les parties entières, puis les dixièmes, puis les centièmes…</p>
+      </div>
+      <h4>Méthode pas à pas</h4>
+      <div class="arrow-row" style="flex-direction:column;align-items:flex-start;gap:6px;">
+        <div class="arrow-row"><span class="step" style="background:var(--accent-light);color:#0C447C;">Étape 1</span><span style="font-size:13px;">Comparer les parties entières → si différentes, c'est terminé</span></div>
+        <div class="arrow-row"><span class="step" style="background:var(--warn-light);color:#633806;">Étape 2</span><span style="font-size:13px;">Si égales, comparer les dixièmes</span></div>
+        <div class="arrow-row"><span class="step" style="background:var(--success-light);color:#27500A;">Étape 3</span><span style="font-size:13px;">Si égaux, comparer les centièmes, etc.</span></div>
+      </div>
+      <h4>Astuce : ajouter des zéros</h4>
+      <p class="body">On peut ajouter des zéros à droite de la partie décimale sans changer la valeur : <strong>3,5 = 3,50 = 3,500</strong>. Cela aide à aligner les chiffres pour comparer.</p>
+      <table class="deco">
+        <tr><th>Nombre</th><th>Dizaines</th><th>Unités</th><th>Dixièmes</th><th>Centièmes</th></tr>
+        <tr><td>4,70</td><td></td><td class="hl">4</td><td class="hl">7</td><td class="hl">0</td></tr>
+        <tr><td>4,07</td><td></td><td class="hl">4</td><td style="background:#FCEBEB;color:#A32D2D;font-weight:500;">0</td><td class="part">7</td></tr>
+      </table>
+      <p class="body" style="font-size:13px;">Même entier (4), mais dixièmes différents : 7 > 0, donc <strong>4,70 > 4,07</strong>.</p>
+      <h4>Exercice : choisis le bon signe</h4>
+      <div id="compare-zone"></div>
+      <h4 style="margin-top:20px;">Ordonner une liste</h4>
+      <p class="body">Pour ordonner, on peut écrire tous les nombres avec le même nombre de décimales, puis comparer comme des entiers.</p>
+      <div class="rule-box">
+        <p>Ordre croissant de 3,2 — 3,09 — 3,25 — 3,1 :<br>
+        → On écrit : 3,20 — 3,09 — 3,25 — 3,10<br>
+        → On compare : 309 &lt; 310 &lt; 320 &lt; 325<br>
+        → Ordre : <strong>3,09 &lt; 3,1 &lt; 3,2 &lt; 3,25</strong></p>
+      </div>
+      <div class="quiz">
+        <div class="quiz-q">Lequel de ces nombres est le plus grand ?</div>
+        <div class="quiz-opts" id="q6-opts">
+          <button onclick="check(this,'q6','a')">7,099</button>
+          <button onclick="check(this,'q6','b')">7,9</button>
+          <button onclick="check(this,'q6','c')">7,09</button>
+          <button onclick="check(this,'q6','d')">7,19</button>
+        </div>
+        <div class="quiz-feedback" id="q6-fb"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const answers = {
+  q1: 'b', q2: 'b', q3: 'b', q6: 'b'
+};
+const feedbacks = {
+  q1: { b: "Correct ! 509 ÷ 1 000 donne bien 0,509 (3 chiffres après la virgule).", a:"Attention : 5,09 = 509/100, pas /1 000.", c:"Attention : 50,9 = 509/10.", d:"Presque ! 0,0509 = 509/10 000."},
+  q2: { b: "Correct ! Le chiffre des centièmes est le 2e après la virgule, ici 8.", a:"Non, 2 est le chiffre des dixièmes.", c:"Non, 3 est le chiffre des millièmes.", d:"Non, 1 est dans la partie entière."},
+  q3: { b: "Correct ! 5 unités + 0 dixième + 6 centièmes + 4 millièmes = 5,064.", a:"5 + 0,6 + 0,04 = 5,64, pas 5,064.", c:"5 + 0,6 + 0,004 = 5,604.", d:"50 + 0,064 = 50,064."},
+  q6: { b: "Correct ! Les dixièmes : 7,9 a 9 dixièmes contre 0 pour 7,09 et 7,099, et 1 pour 7,19.", a:"7,099 < 7,9 car 0 dixième < 9 dixièmes.", c:"7,09 < 7,9.", d:"7,19 < 7,9 car 1 dixième < 9 dixièmes."}
+};
+function check(btn, qid, opt) {
+  const opts = document.querySelectorAll('#'+qid+'-opts button');
+  opts.forEach(b => { b.classList.remove('correct','wrong'); b.disabled = true; });
+  const fb = document.getElementById(qid+'-fb');
+  if (opt === answers[qid]) {
+    btn.classList.add('correct');
+    fb.textContent = '✓ ' + feedbacks[qid][opt];
+    fb.className = 'quiz-feedback show ok';
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = '✗ ' + feedbacks[qid][opt];
+    fb.className = 'quiz-feedback show ko';
+  }
+}
+function toggle(id) {
+  const c = document.getElementById(id);
+  c.classList.toggle('open');
+}
+
+// Droite graduée
+function buildDroite() {
+  const container = document.getElementById('droite-container');
+  const msg = document.getElementById('droite-msg');
+  const targets = [2.3, 3.7, 4.1];
+  let current = 0;
+  function render() {
+    if (current >= targets.length) {
+      container.innerHTML = '<p style="color:#3B6D11;font-size:14px;font-weight:500;">Bravo ! Tu as placé tous les nombres correctement.</p>';
+      msg.textContent = '';
+      return;
+    }
+    const t = targets[current];
+    const lo = Math.floor(t), hi = lo + 1;
+    const W = 560, H = 80, pad = 40;
+    const steps = 10;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" style="max-width:100%;overflow:visible;" xmlns="http://www.w3.org/2000/svg">`;
+    svg += `<line x1="${pad}" y1="40" x2="${W-pad}" y2="40" stroke="var(--color-text-secondary)" stroke-width="1.5"/>`;
+    svg += `<polygon points="${W-pad},40 ${W-pad-8},36 ${W-pad-8},44" fill="var(--color-text-secondary)"/>`;
+    for (let i = 0; i <= steps; i++) {
+      const x = pad + (W - 2*pad) * i / steps;
+      const val = (lo + i*0.1).toFixed(1);
+      const isMain = (i === 0 || i === steps);
+      svg += `<line x1="${x}" y1="${isMain?28:34}" x2="${x}" y2="52" stroke="var(--color-text-secondary)" stroke-width="${isMain?1.5:0.8}"/>`;
+      if (isMain) svg += `<text x="${x}" y="66" text-anchor="middle" font-size="12" fill="var(--color-text-primary)" font-family="var(--font-sans)">${lo + i/10 === lo ? lo : hi}</text>`;
+      else if (i % 5 === 0) svg += `<text x="${x}" y="66" text-anchor="middle" font-size="11" fill="var(--color-text-secondary)" font-family="var(--font-sans)">${val}</text>`;
+    }
+    svg += `</svg>`;
+    container.innerHTML = `<p style="font-size:14px;margin-bottom:10px;font-weight:500;">Clique sur la position de <span style="color:#185FA5;font-size:16px;">${t}</span> sur la droite :</p>` + svg;
+    msg.textContent = 'Clique sur le bon repère.';
+    const svgEl = container.querySelector('svg');
+    svgEl.style.cursor = 'crosshair';
+    svgEl.addEventListener('click', function(e) {
+      const rect = svgEl.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const clickX = (e.clientX - rect.left) * scaleX;
+      const expectedX = pad + (W - 2*pad) * (t - lo);
+      const tol = (W - 2*pad) * 0.055;
+      if (Math.abs(clickX - expectedX) < tol) {
+        msg.innerHTML = `<span style="color:#3B6D11;font-weight:500;">✓ Correct ! ${t} est bien ici.</span>`;
+        current++;
+        setTimeout(render, 900);
+      } else {
+        msg.innerHTML = `<span style="color:#A32D2D;">✗ Pas tout à fait. Essaie encore — cherche entre ${lo} et ${hi}.</span>`;
+      }
+    });
+  }
+  render();
+}
+buildDroite();
+
+// Encadrement
+function buildEnc() {
+  const zone = document.getElementById('enc-zone');
+  const nums = [7.4, 13.9, 0.3, 25.01];
+  let html = '';
+  nums.forEach((n, i) => {
+    html += `<div class="encadre" style="margin-bottom:14px;">
+      <input type="number" id="enc${i}lo" placeholder="?" step="1" min="0">
+      <span>&lt;</span>
+      <span class="nb">${n}</span>
+      <span>&lt;</span>
+      <input type="number" id="enc${i}hi" placeholder="?" step="1" min="0">
+      <button class="check-btn" onclick="checkEnc(${i},${n})">Vérifier</button>
+      <span id="enc${i}res" style="font-size:13px;"></span>
+    </div>`;
+  });
+  zone.innerHTML = html;
+}
+function checkEnc(i, n) {
+  const lo = parseFloat(document.getElementById('enc'+i+'lo').value);
+  const hi = parseFloat(document.getElementById('enc'+i+'hi').value);
+  const res = document.getElementById('enc'+i+'res');
+  const correct = (lo === Math.floor(n) && hi === Math.floor(n)+1);
+  if (correct) { res.innerHTML = '<span style="color:#3B6D11;font-weight:500;">✓ Correct !</span>'; }
+  else { res.innerHTML = `<span style="color:#A32D2D;">✗ Réponse : ${Math.floor(n)} &lt; ${n} &lt; ${Math.floor(n)+1}</span>`; }
+}
+buildEnc();
+
+// Comparaison
+function buildCompare() {
+  const zone = document.getElementById('compare-zone');
+  const pairs = [[4.5, 4.50],[3.09, 3.9],[12.1, 12.10],[7.05, 7.5]];
+  const correctSigns = ['=','<','=','<'];
+  let html = '';
+  pairs.forEach((p, i) => {
+    html += `<div class="compare-row" style="margin-bottom:12px;">
+      <span class="nb">${p[0]}</span>
+      <div class="sign-sel" id="ss${i}">
+        <button onclick="pickSign(${i},'<')">＜</button>
+        <button onclick="pickSign(${i},'=')">＝</button>
+        <button onclick="pickSign(${i},'>')">＞</button>
+      </div>
+      <span class="nb">${p[1]}</span>
+      <span id="cmp${i}res" style="font-size:13px;"></span>
+    </div>`;
+  });
+  zone.innerHTML = html;
+  window._cmpSel = {};
+  window._cmpCorrect = correctSigns;
+}
+function pickSign(i, s) {
+  window._cmpSel[i] = s;
+  const btns = document.querySelectorAll('#ss'+i+' button');
+  btns.forEach(b => b.classList.remove('active'));
+  btns.forEach(b => { if (b.textContent.trim() === (s==='<'?'＜':s==='='?'＝':'＞')) b.classList.add('active'); });
+  const res = document.getElementById('cmp'+i+'res');
+  if (s === window._cmpCorrect[i]) res.innerHTML = '<span style="color:#3B6D11;font-weight:500;">✓</span>';
+  else res.innerHTML = `<span style="color:#A32D2D;">✗ c'est ${window._cmpCorrect[i]}</span>`;
+}
+buildCompare();
+</script>
